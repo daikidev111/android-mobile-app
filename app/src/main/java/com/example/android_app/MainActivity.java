@@ -2,9 +2,12 @@ package com.example.android_app;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,5 +26,10 @@ public class MainActivity extends AppCompatActivity {
         softwareTextView.setText(itUnit.getSoftware());
         idTextView.setText(itUnit.getID());
         nameTextView.setText(itUnit.getName());
+    }
+
+    public void goToNext(View view) {
+        Intent myIntent = new Intent(MainActivity.this, bookManagementActivity.class);
+        startActivity(myIntent);
     }
 }
