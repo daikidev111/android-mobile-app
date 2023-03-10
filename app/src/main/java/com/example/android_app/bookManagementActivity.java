@@ -61,4 +61,11 @@ public class bookManagementActivity extends AppCompatActivity {
 
         Toast.makeText(bookManagementActivity.this, "Cleared Inputs", Toast.LENGTH_SHORT).show();
     }
+
+    public void doublePrice(View view) {
+        EditText editPrice = findViewById(R.id.editPrice);
+        int price = Integer.parseInt(editPrice.getText().toString()) * 2;
+        Toast.makeText(bookManagementActivity.this, "Doubled the price: " + price, Toast.LENGTH_SHORT).show();
+        editPrice.setText(String.valueOf(price));
+    }
 }
