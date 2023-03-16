@@ -1,8 +1,10 @@
 package com.example.android_app;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -14,11 +16,60 @@ import java.util.List;
 public class bookManagementActivity extends AppCompatActivity {
     private List<Book> bookCollection = new ArrayList<>();
 
+    private String titleState;
+    private int ISBNState;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_management);
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.i("a", "onStart");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i("a", "onResume");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i("a", "onPause");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i("a", "onStop");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.i("a", "onDestroy");
+    }
+
+//    @Override
+//    protected void onSaveInstanceState(@NonNull Bundle outState) {
+//        super.onSaveInstanceState(outState);
+//        EditText editTitle = findViewById(R.id.editTitle);
+//        EditText editISBN = findViewById(R.id.editISBN);
+//        String titleState = editTitle.getText().toString();
+//        int ISBNState = Integer.parseInt(editISBN.getText().toString());
+//        outState.putString("title", titleState);
+//        outState.putInt("ISBN", ISBNState);
+//    }
+
+//    @Override
+//    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+//        super.onRestoreInstanceState(savedInstanceState);
+//    }
 
     public void showToast(View view) {
         EditText editID = findViewById(R.id.editID);
@@ -62,7 +113,7 @@ public class bookManagementActivity extends AppCompatActivity {
         Toast.makeText(bookManagementActivity.this, "Cleared Inputs", Toast.LENGTH_SHORT).show();
     }
 
-    public void doublePrice(View view) {
+    public void loadBook(View view) {
         EditText editPrice = findViewById(R.id.editPrice);
         int price = Integer.parseInt(editPrice.getText().toString()) * 2;
         Toast.makeText(bookManagementActivity.this, "Doubled the price: " + price, Toast.LENGTH_SHORT).show();
