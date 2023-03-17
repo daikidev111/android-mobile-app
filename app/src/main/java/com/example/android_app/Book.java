@@ -3,12 +3,12 @@ package com.example.android_app;
 public class Book {
     private String ID;
     private String title;
-    private int isbn;
+    private String isbn;
     private String author;
     private String description;
     private int price;
 
-    public Book(String ID, String title, int isbn, String author, String description, int price) {
+    public Book(String ID, String title, String isbn, String author, String description, int price) {
         this.ID = ID;
         this.title = title;
         this.isbn = isbn;
@@ -25,7 +25,7 @@ public class Book {
         return this.title;
     }
 
-    public int getIsbn() {
+    public String getIsbn() {
         return this.isbn;
     }
 
@@ -49,7 +49,7 @@ public class Book {
         this.title = title;
     }
 
-    public void setIsbn(int isbn) {
+    public void setIsbn(String isbn) {
         this.isbn = isbn;
     }
 
