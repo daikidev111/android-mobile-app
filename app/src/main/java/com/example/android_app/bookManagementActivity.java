@@ -2,29 +2,47 @@ package com.example.android_app;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.StringTokenizer;
 
 public class bookManagementActivity extends AppCompatActivity {
-    private List<Book> bookCollection = new ArrayList<>();
-    private String savedTitle;
-    private String savedISBN;
+    private final List<Book> bookCollection = new ArrayList<>();
+    TextView editID, editTitle, editISBN, editAuthor, editDescription, editPrice;
+
+    String savedTitle;
+    String savedISBN;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_management);
         Log.i("a", "onCreate");
+
+        editID = findViewById(R.id.editID);
+        editTitle = findViewById(R.id.editTitle);
+        editISBN = findViewById(R.id.editISBN);
+        editAuthor = findViewById(R.id.editAuthor);
+        editDescription = findViewById(R.id.editDescription);
+        editPrice = findViewById(R.id.editPrice);
+
+        /* Request permissions to access SMS */
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS, Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS}, 0);
+        registerReceiver(myBroadCastReceiver, new IntentFilter(SMSReceiver.SMS_FILTER));
     }
 
     @Override
@@ -201,4 +219,25 @@ public class bookManagementActivity extends AppCompatActivity {
         bookEditor.putString("ISBN", "00112233");
         bookEditor.apply();
     }
+
+    private BroadcastReceiver myBroadCastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String msg = intent.getStringExtra(SMSReceiver.SMS_MSG_KEY);
+            StringTokenizer sT = new StringTokenizer(msg, "|");
+            String ID = sT.nextToken();
+            String Title = sT.nextToken();
+            String ISBN = sT.nextToken();
+            String Author = sT.nextToken();
+            String Description = sT.nextToken();
+            String Price = sT.nextToken();
+
+            editID.setText(ID);
+            editISBN.setText(ISBN);
+            editTitle.setText(Title);
+            editAuthor.setText(Author);
+            editDescription.setText(Description);
+            editPrice.setText(Price);
+        }
+    };
 }
