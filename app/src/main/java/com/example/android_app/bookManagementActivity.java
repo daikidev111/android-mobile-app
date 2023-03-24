@@ -42,7 +42,7 @@ public class bookManagementActivity extends AppCompatActivity {
 
         /* Request permissions to access SMS */
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS, Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS}, 0);
-        registerReceiver(myBroadCastReceiver, new IntentFilter(SMSReceiver.SMS_FILTER));
+        registerReceiver(bookBroadCastReceiver, new IntentFilter(SMSReceiver.SMS_FILTER));
     }
 
     @Override
@@ -220,7 +220,7 @@ public class bookManagementActivity extends AppCompatActivity {
         bookEditor.apply();
     }
 
-    private BroadcastReceiver myBroadCastReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver bookBroadCastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String msg = intent.getStringExtra(SMSReceiver.SMS_MSG_KEY);
@@ -231,12 +231,20 @@ public class bookManagementActivity extends AppCompatActivity {
             String Author = sT.nextToken();
             String Description = sT.nextToken();
             String Price = sT.nextToken();
+            String addBool = sT.nextToken();
+            boolean addPriceBool = Boolean.parseBoolean(addBool);
 
             editID.setText(ID);
             editISBN.setText(ISBN);
             editTitle.setText(Title);
             editAuthor.setText(Author);
             editDescription.setText(Description);
+
+            if (addPriceBool) {
+                Price = String.valueOf(Integer.parseInt(Price) + 100);
+            } else {
+               Price = String.valueOf(Integer.parseInt(Price) + 5);
+            }
             editPrice.setText(Price);
         }
     };

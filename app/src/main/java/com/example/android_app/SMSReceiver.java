@@ -13,6 +13,9 @@ public class SMSReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+
+        // since it uses Telephony class that has only one method to retrieve message from the intent
+        // it has to be converted into an array and execute for loop
         SmsMessage[] messages = Telephony.Sms.Intents.getMessagesFromIntent(intent);
         for (SmsMessage currentMessage : messages) {
             String message = currentMessage.getDisplayMessageBody();
