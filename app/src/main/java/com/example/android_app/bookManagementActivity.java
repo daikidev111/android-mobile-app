@@ -24,14 +24,11 @@ public class bookManagementActivity extends AppCompatActivity {
     private final List<Book> bookCollection = new ArrayList<>();
     TextView editID, editTitle, editISBN, editAuthor, editDescription, editPrice;
 
-    String savedTitle;
-    String savedISBN;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i("lifecycle", "onCreate invoked");
         setContentView(R.layout.activity_book_management);
-        Log.i("a", "onCreate");
 
         editID = findViewById(R.id.editID);
         editTitle = findViewById(R.id.editTitle);
@@ -48,14 +45,7 @@ public class bookManagementActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        Log.i("a", "onStart");
-
-        EditText editID = findViewById(R.id.editID);
-        EditText editTitle = findViewById(R.id.editTitle);
-        EditText editISBN = findViewById(R.id.editISBN);
-        EditText editAuthor = findViewById(R.id.editAuthor);
-        EditText editDescription = findViewById(R.id.editDescription);
-        EditText editPrice = findViewById(R.id.editPrice);
+        Log.i("lifecycle", "onStart invoked");
 
         SharedPreferences bookData = getSharedPreferences("last_book", 0);
         String ID = bookData.getString("id", "");
@@ -76,53 +66,41 @@ public class bookManagementActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.i("a", "onResume");
+        Log.i("lifecycle", "onResume invoked");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.i("a", "onPause");
+        Log.i("lifecycle", "onPause invoked");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.i("a", "onStop");
+        Log.i("lifecycle", "onStop invoked");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.i("a", "onDestroy");
+        Log.i("lifecycle", "onDestroy invoked");
     }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.i("a", "onSaveInstanceState");
-        EditText editTitle = findViewById(R.id.editTitle);
-        EditText editISBN = findViewById(R.id.editISBN);
-        savedTitle = editTitle.getText().toString();
-        savedISBN = editISBN.getText().toString();
-        outState.putString("title", savedTitle);
-        outState.putString("ISBN", savedISBN);
+        Log.i("lifecycle", "onSaveInstanceState invoked");
+        outState.putString("title", editTitle.getText().toString());
+        outState.putString("ISBN", editISBN.getText().toString());
     }
 
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        Log.i("a", "onRestoreInstanceState");
-        EditText editID = findViewById(R.id.editID);
-        EditText editTitle = findViewById(R.id.editTitle);
-        EditText editISBN = findViewById(R.id.editISBN);
-        EditText editAuthor = findViewById(R.id.editAuthor);
-        EditText editDescription = findViewById(R.id.editDescription);
-        EditText editPrice = findViewById(R.id.editPrice);
-
+        Log.i("lifecycle", "onRestoreInstanceState invoked");
         editTitle.setText(savedInstanceState.getString("title"));
         editISBN.setText(savedInstanceState.getString("ISBN"));
-
         editID.setText("");
         editAuthor.setText("");
         editDescription.setText("");
@@ -130,13 +108,6 @@ public class bookManagementActivity extends AppCompatActivity {
     }
 
     public void showToast(View view) {
-        EditText editID = findViewById(R.id.editID);
-        EditText editTitle = findViewById(R.id.editTitle);
-        EditText editISBN = findViewById(R.id.editISBN);
-        EditText editAuthor = findViewById(R.id.editAuthor);
-        EditText editDescription = findViewById(R.id.editDescription);
-        EditText editPrice = findViewById(R.id.editPrice);
-
         String ID = editID.getText().toString();
         String Title = editTitle.getText().toString();
         String ISBN = editISBN.getText().toString();
@@ -190,13 +161,6 @@ public class bookManagementActivity extends AppCompatActivity {
 //    }
 
     public void loadBook(View view) {
-        EditText editID = findViewById(R.id.editID);
-        EditText editTitle = findViewById(R.id.editTitle);
-        EditText editISBN = findViewById(R.id.editISBN);
-        EditText editAuthor = findViewById(R.id.editAuthor);
-        EditText editDescription = findViewById(R.id.editDescription);
-        EditText editPrice = findViewById(R.id.editPrice);
-
         SharedPreferences bookData = getSharedPreferences("last_book", 0);
         String ID = bookData.getString("id", "");
         String Title = bookData.getString("title", "");
