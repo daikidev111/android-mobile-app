@@ -30,10 +30,15 @@
 
         <activity
             android:name=".bookManagementActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"
+            />
+
         <activity
             android:name=".FinishActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+<!--            this is added to remove the default action bar-->
         <activity
             android:name=".MainActivity"
             android:exported="true">

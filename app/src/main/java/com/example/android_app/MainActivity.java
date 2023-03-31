@@ -9,6 +9,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void goToNext(View view) {
         Intent myIntent = new Intent(MainActivity.this, bookManagementActivity.class);
+        // Intent myIntent = new Intent(MainActivity.this, FinishActivity.class);
         startActivity(myIntent);
     }
 }
