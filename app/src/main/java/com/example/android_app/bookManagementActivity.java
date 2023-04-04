@@ -1,8 +1,11 @@
 package com.example.android_app;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.MenuView;
 import androidx.core.app.ActivityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
@@ -12,10 +15,20 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.internal.NavigationMenuItemView;
+import com.google.android.material.navigation.NavigationView;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -23,12 +36,23 @@ import java.util.StringTokenizer;
 public class bookManagementActivity extends AppCompatActivity {
     private final List<Book> bookCollection = new ArrayList<>();
     TextView editID, editTitle, editISBN, editAuthor, editDescription, editPrice;
+    FloatingActionButton fabAdd;
+
+    ArrayList<String> bookList = new ArrayList<String>();
+    ArrayAdapter bookAdapter;
+    ListView bookListView;
+
+    Toolbar bookToolBar;
+    DrawerLayout bookDrawer;
+
+    NavigationView bookNavigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i("lifecycle", "onCreate invoked");
-        setContentView(R.layout.activity_book_management);
+        // setContentView(R.layout.activity_book_management);
+        setContentView(R.layout.drawer);
 
         editID = findViewById(R.id.editID);
         editTitle = findViewById(R.id.editTitle);
@@ -40,6 +64,83 @@ public class bookManagementActivity extends AppCompatActivity {
         /* Request permissions to access SMS */
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS, Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS}, 0);
         registerReceiver(bookBroadCastReceiver, new IntentFilter(SMSReceiver.SMS_FILTER));
+
+        // this creates a list view with an adapter
+        bookListView = findViewById(R.id.bookListView);
+        bookAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, bookList);
+        bookListView.setAdapter(bookAdapter);
+        fabAdd = findViewById(R.id.fab_add);
+        fabAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(), "Item added", Toast.LENGTH_LONG).show();
+                showToast();
+                bookList.add(editTitle.getText().toString());
+                bookAdapter.notifyDataSetChanged();
+            }
+        });
+
+        // place a drawer on the toolbar
+        bookToolBar = findViewById(R.id.bookToolBar);
+        bookDrawer = findViewById(R.id.bookDrawer);
+        setSupportActionBar(bookToolBar);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this,
+                bookDrawer,
+                bookToolBar,
+                R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close
+        );
+        bookDrawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        bookNavigation = findViewById(R.id.bookNavigation);
+        bookNavigation.setNavigationItemSelectedListener(new bookNavigationListener());
+    }
+
+    class bookNavigationListener implements NavigationView.OnNavigationItemSelectedListener {
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            int id = item.getItemId();
+            if (id == R.id.add_books) {
+                bookList.add(editTitle.getText().toString());
+                Toast.makeText(getApplicationContext(), "Book added", Toast.LENGTH_SHORT).show();
+                bookAdapter.notifyDataSetChanged();
+            } else if (id == R.id.remove_last_book) {
+                bookList.remove(bookList.size() - 1);
+                Toast.makeText(getApplicationContext(), "Last Book Removed", Toast.LENGTH_SHORT).show();
+                bookAdapter.notifyDataSetChanged();
+            } else if (id == R.id.remove_all_books) {
+                bookList.clear();
+                Toast.makeText(getApplicationContext(), "All Books Removed", Toast.LENGTH_SHORT).show();
+                bookAdapter.notifyDataSetChanged();
+            } else if (id == R.id.close) {
+                finishAffinity();
+            }
+            bookDrawer.closeDrawers();
+            return true;
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+       getMenuInflater().inflate(R.menu.option_menu, menu);
+       return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.clear_fields) {
+            clearInputs();
+            Toast.makeText(getApplicationContext(), "Cleared Fields", Toast.LENGTH_SHORT).show();
+        } else if (id == R.id.load_book) {
+            loadBook();
+            Toast.makeText(getApplicationContext(), "Book Loaded", Toast.LENGTH_SHORT).show();
+        } else if (id == R.id.total_book) {
+            Toast.makeText(getApplicationContext(), "Total Book: " + String.valueOf(bookList.size()), Toast.LENGTH_SHORT).show();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -107,7 +208,7 @@ public class bookManagementActivity extends AppCompatActivity {
         editPrice.setText("");
     }
 
-    public void showToast(View view) {
+    public void showToast() {
         String ID = editID.getText().toString();
         String Title = editTitle.getText().toString();
         String ISBN = editISBN.getText().toString();
@@ -136,7 +237,7 @@ public class bookManagementActivity extends AppCompatActivity {
         bookEditor.apply();
     }
 
-    public void clearInputs(View view) {
+    public void clearInputs() {
         EditText editID = findViewById(R.id.editID);
         EditText editTitle = findViewById(R.id.editTitle);
         EditText editISBN = findViewById(R.id.editISBN);
@@ -160,7 +261,7 @@ public class bookManagementActivity extends AppCompatActivity {
 //        editPrice.setText(String.valueOf(price));
 //    }
 
-    public void loadBook(View view) {
+    public void loadBook() {
         SharedPreferences bookData = getSharedPreferences("last_book", 0);
         String ID = bookData.getString("id", "");
         String Title = bookData.getString("title", "");
