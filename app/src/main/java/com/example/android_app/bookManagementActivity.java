@@ -8,6 +8,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -24,28 +25,38 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.internal.NavigationMenuItemView;
 import com.google.android.material.navigation.NavigationView;
 
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
 public class bookManagementActivity extends AppCompatActivity {
-    private final List<Book> bookCollection = new ArrayList<>();
+//    private final List<Book> bookCollection = new ArrayList<>();
     TextView editID, editTitle, editISBN, editAuthor, editDescription, editPrice;
     FloatingActionButton fabAdd;
 
-    ArrayList<String> bookList = new ArrayList<String>();
-    ArrayAdapter bookAdapter;
+//    ArrayAdapter bookAdapter;
     ListView bookListView;
 
     Toolbar bookToolBar;
     DrawerLayout bookDrawer;
 
     NavigationView bookNavigation;
+
+    ArrayList<Book> bookList = new ArrayList<Book>();
+
+    RecyclerView recyclerView;
+    RecyclerView.LayoutManager layoutManager;
+    MyRecyclerViewAdapter adapter;
+
+    public int count = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,19 +77,12 @@ public class bookManagementActivity extends AppCompatActivity {
         registerReceiver(bookBroadCastReceiver, new IntentFilter(SMSReceiver.SMS_FILTER));
 
         // this creates a list view with an adapter
-        bookListView = findViewById(R.id.bookListView);
-        bookAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, bookList);
-        bookListView.setAdapter(bookAdapter);
+//        bookListView = findViewById(R.id.bookListView);
+//        bookAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, bookList);
+//        bookListView.setAdapter(bookAdapter);
+
+        // creation of fab button
         fabAdd = findViewById(R.id.fab_add);
-        fabAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "Item added", Toast.LENGTH_LONG).show();
-                showToast();
-                bookList.add(editTitle.getText().toString());
-                bookAdapter.notifyDataSetChanged();
-            }
-        });
 
         // place a drawer on the toolbar
         bookToolBar = findViewById(R.id.bookToolBar);
@@ -96,24 +100,52 @@ public class bookManagementActivity extends AppCompatActivity {
 
         bookNavigation = findViewById(R.id.bookNavigation);
         bookNavigation.setNavigationItemSelectedListener(new bookNavigationListener());
+
+
+        // Recycler View
+        recyclerView = findViewById(R.id.rv);
+
+        layoutManager = new LinearLayoutManager(this);  //A RecyclerView.LayoutManager implementation which provides similar functionality to ListView.
+        recyclerView.setLayoutManager(layoutManager);   // Also StaggeredGridLayoutManager and GridLayoutManager or a custom Layout manager
+        adapter = new MyRecyclerViewAdapter();
+        adapter.setData(bookList);
+        recyclerView.setAdapter(adapter);
+
+        // onClick listener for the fab button
+        fabAdd.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(), "Item added", Toast.LENGTH_LONG).show();
+                showToast();
+                Book book = new Book(editID.getText().toString(), editTitle.getText().toString(), editISBN.getText().toString(),
+                        editDescription.getText().toString(), editAuthor.getText().toString(), editPrice.getText().toString());
+                bookList.add(book);
+                adapter.notifyDataSetChanged();
+            }
+        });
+
     }
 
     class bookNavigationListener implements NavigationView.OnNavigationItemSelectedListener {
+        @SuppressLint("NotifyDataSetChanged")
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             int id = item.getItemId();
             if (id == R.id.add_books) {
-                bookList.add(editTitle.getText().toString());
+                Book book = new Book(editID.getText().toString(), editTitle.getText().toString(), editISBN.getText().toString(),
+                        editDescription.getText().toString(), editAuthor.getText().toString(), editPrice.getText().toString());
+                bookList.add(book);
                 Toast.makeText(getApplicationContext(), "Book added", Toast.LENGTH_SHORT).show();
-                bookAdapter.notifyDataSetChanged();
+                adapter.notifyDataSetChanged();
             } else if (id == R.id.remove_last_book) {
                 bookList.remove(bookList.size() - 1);
                 Toast.makeText(getApplicationContext(), "Last Book Removed", Toast.LENGTH_SHORT).show();
-                bookAdapter.notifyDataSetChanged();
+                adapter.notifyDataSetChanged();
             } else if (id == R.id.remove_all_books) {
                 bookList.clear();
                 Toast.makeText(getApplicationContext(), "All Books Removed", Toast.LENGTH_SHORT).show();
-                bookAdapter.notifyDataSetChanged();
+                adapter.notifyDataSetChanged();
             } else if (id == R.id.close) {
                 finishAffinity();
             }
@@ -189,7 +221,7 @@ public class bookManagementActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         Log.i("lifecycle", "onSaveInstanceState invoked");
         outState.putString("title", editTitle.getText().toString());
@@ -216,15 +248,14 @@ public class bookManagementActivity extends AppCompatActivity {
         String Description = editDescription.getText().toString();
         int Price = Integer.parseInt(editPrice.getText().toString());
 
-        Book book = new Book(ID, Title, ISBN, Author, Description, Price);
+//        Book book = new Book(ID, Title, ISBN, Author, Description, editPrice.getText().toString());
 
         String toastMessage = "Confirm with the title and price: \n" + "Title: " + Title + "\n" + "Price: " + Price;
 
         // All the information (everything about the application) is contained in "this"
         // LENGTH_SHORT means displaying the toast for a short period of time
         Toast.makeText(bookManagementActivity.this, toastMessage, Toast.LENGTH_SHORT).show();
-
-        bookCollection.add(book);
+//        bookList.add(book);
 
         SharedPreferences bookData = getSharedPreferences("last_book", 0);
         SharedPreferences.Editor bookEditor = bookData.edit();
@@ -285,7 +316,7 @@ public class bookManagementActivity extends AppCompatActivity {
         bookEditor.apply();
     }
 
-    private BroadcastReceiver bookBroadCastReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver bookBroadCastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String msg = intent.getStringExtra(SMSReceiver.SMS_MSG_KEY);
@@ -313,4 +344,5 @@ public class bookManagementActivity extends AppCompatActivity {
             editPrice.setText(Price);
         }
     };
+
 }
