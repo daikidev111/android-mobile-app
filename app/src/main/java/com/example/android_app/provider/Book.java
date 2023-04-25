@@ -1,11 +1,34 @@
-package com.example.android_app;
+package com.example.android_app.provider;
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "books")
 public class Book {
+
+    @PrimaryKey(autoGenerate = true)
+    @NonNull
+    @ColumnInfo(name = "bookID")
+    private int bookID;
+    
+    @ColumnInfo(name = "ID")
     private String ID;
+    
+    @ColumnInfo(name="title")
     private String title;
+
+    @ColumnInfo(name="isbn")
     private String isbn;
+
+    @ColumnInfo(name="author")
     private String author;
+
+    @ColumnInfo(name="description")
     private String description;
+
+    @ColumnInfo(name="price")
     private String price;
 
     public Book(String ID, String title, String isbn, String author, String description, String price) {
@@ -15,6 +38,14 @@ public class Book {
         this.author = author;
         this.description = description;
         this.price = price;
+    }
+
+    public int getBookID() {
+        return this.bookID;
+    };
+
+    public void setBookID(int bookID) {
+        this.bookID = bookID;
     }
 
     public String getID() {
