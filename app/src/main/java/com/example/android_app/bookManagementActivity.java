@@ -121,7 +121,7 @@ public class bookManagementActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Item added", Toast.LENGTH_LONG).show();
                 showToast();
                 Book book = new Book(editID.getText().toString(), editTitle.getText().toString(), editISBN.getText().toString(),
-                        editDescription.getText().toString(), editAuthor.getText().toString(), editPrice.getText().toString());
+                        editDescription.getText().toString(), editAuthor.getText().toString(), Integer.parseInt(editPrice.getText().toString()));
                 mBookViewModel.insert(book);
             }
         });
@@ -135,7 +135,7 @@ public class bookManagementActivity extends AppCompatActivity {
             int id = item.getItemId();
             if (id == R.id.add_books) {
                 Book book = new Book(editID.getText().toString(), editTitle.getText().toString(), editISBN.getText().toString(),
-                        editDescription.getText().toString(), editAuthor.getText().toString(), editPrice.getText().toString());
+                        editDescription.getText().toString(), editAuthor.getText().toString(), Integer.parseInt(editPrice.getText().toString()));
                 mBookViewModel.insert(book);
                 Toast.makeText(getApplicationContext(), "Book added", Toast.LENGTH_SHORT).show();
             } else if (id == R.id.remove_last_book) {
