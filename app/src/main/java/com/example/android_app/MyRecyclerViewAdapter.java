@@ -9,14 +9,22 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.android_app.provider.Book;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.ViewHolder> {
 
-    ArrayList<Book> data;
+//    ArrayList<Book> data;
+    List<Book> data;
 
-    public void setData(ArrayList<Book> data) {
+    public void setData(List<Book> data) {
         this.data = data;
+    }
+
+    public List<Book> getBooks() {
+        return this.data;
     }
 
     @NonNull
@@ -24,8 +32,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     public MyRecyclerViewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         // card inflator
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.book_card_view, parent, false);
-        ViewHolder viewHolder = new ViewHolder(v);
-        return viewHolder;
+        return new ViewHolder(v);
     }
 
     @Override
@@ -51,6 +58,10 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     public int getItemCount() {
         // Cannot return 0!! -> tell the recycler view that there is no data in the recycleView
         // return 0;
+
+        if (this.data == null) {
+           return 0;
+        }
         return data.size(); // to keep track of the posistion
     }
 

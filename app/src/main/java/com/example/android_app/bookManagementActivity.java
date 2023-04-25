@@ -3,7 +3,6 @@ package com.example.android_app;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.menu.MenuView;
 import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -19,22 +18,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.lifecycle.ViewModelProvider;
 
+import com.example.android_app.provider.Book;
+import com.example.android_app.provider.BookViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.internal.NavigationMenuItemView;
 import com.google.android.material.navigation.NavigationView;
 
-import java.sql.Array;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.StringTokenizer;
 
 public class bookManagementActivity extends AppCompatActivity {
@@ -50,11 +45,14 @@ public class bookManagementActivity extends AppCompatActivity {
 
     NavigationView bookNavigation;
 
-    ArrayList<Book> bookList = new ArrayList<Book>();
+//    ArrayList<Book> bookList = new ArrayList<Book>();
 
-    RecyclerView recyclerView;
-    RecyclerView.LayoutManager layoutManager;
-    MyRecyclerViewAdapter adapter;
+//    RecyclerView recyclerView;
+//    RecyclerView.LayoutManager layoutManager;
+//    MyRecyclerViewAdapter adapter;
+
+    // declare view model for book object
+    private BookViewModel mBookViewModel;
 
     public int count = 0;
 
@@ -101,27 +99,30 @@ public class bookManagementActivity extends AppCompatActivity {
         bookNavigation = findViewById(R.id.bookNavigation);
         bookNavigation.setNavigationItemSelectedListener(new bookNavigationListener());
 
+        // instantiate bookViewModel
+        mBookViewModel = new ViewModelProvider(this).get(BookViewModel.class);
 
-        // Recycler View
-        recyclerView = findViewById(R.id.rv);
+        // Fragment
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_book_frame, new BookRecyclerViewFragment()).commit();
 
-        layoutManager = new LinearLayoutManager(this);  //A RecyclerView.LayoutManager implementation which provides similar functionality to ListView.
-        recyclerView.setLayoutManager(layoutManager);   // Also StaggeredGridLayoutManager and GridLayoutManager or a custom Layout manager
-        adapter = new MyRecyclerViewAdapter();
-        adapter.setData(bookList);
-        recyclerView.setAdapter(adapter);
+//        // Recycler View
+//        recyclerView = findViewById(R.id.rv);
+//
+//        layoutManager = new LinearLayoutManager(this);  //A RecyclerView.LayoutManager implementation which provides similar functionality to ListView.
+//        recyclerView.setLayoutManager(layoutManager);   // Also StaggeredGridLayoutManager and GridLayoutManager or a custom Layout manager
+//        adapter = new MyRecyclerViewAdapter();
+//        adapter.setData(bookList);
+//        recyclerView.setAdapter(adapter);
 
         // onClick listener for the fab button
         fabAdd.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onClick(View view) {
                 Toast.makeText(getApplicationContext(), "Item added", Toast.LENGTH_LONG).show();
                 showToast();
                 Book book = new Book(editID.getText().toString(), editTitle.getText().toString(), editISBN.getText().toString(),
-                        editDescription.getText().toString(), editAuthor.getText().toString(), editPrice.getText().toString());
-                bookList.add(book);
-                adapter.notifyDataSetChanged();
+                        editDescription.getText().toString(), editAuthor.getText().toString(), Integer.parseInt(editPrice.getText().toString()));
+                mBookViewModel.insert(book);
             }
         });
 
@@ -134,18 +135,18 @@ public class bookManagementActivity extends AppCompatActivity {
             int id = item.getItemId();
             if (id == R.id.add_books) {
                 Book book = new Book(editID.getText().toString(), editTitle.getText().toString(), editISBN.getText().toString(),
-                        editDescription.getText().toString(), editAuthor.getText().toString(), editPrice.getText().toString());
-                bookList.add(book);
+                        editDescription.getText().toString(), editAuthor.getText().toString(), Integer.parseInt(editPrice.getText().toString()));
+                mBookViewModel.insert(book);
                 Toast.makeText(getApplicationContext(), "Book added", Toast.LENGTH_SHORT).show();
-                adapter.notifyDataSetChanged();
             } else if (id == R.id.remove_last_book) {
-                bookList.remove(bookList.size() - 1);
+                mBookViewModel.deleteLastBook();
                 Toast.makeText(getApplicationContext(), "Last Book Removed", Toast.LENGTH_SHORT).show();
-                adapter.notifyDataSetChanged();
             } else if (id == R.id.remove_all_books) {
-                bookList.clear();
+                mBookViewModel.deleteAll();
                 Toast.makeText(getApplicationContext(), "All Books Removed", Toast.LENGTH_SHORT).show();
-                adapter.notifyDataSetChanged();
+            } else if (id == R.id.view_list) {
+                Intent bookListIntent = new Intent(bookManagementActivity.this, bookListActivity.class);
+                startActivity(bookListIntent);
             } else if (id == R.id.close) {
                 finishAffinity();
             }
@@ -170,7 +171,16 @@ public class bookManagementActivity extends AppCompatActivity {
             loadBook();
             Toast.makeText(getApplicationContext(), "Book Loaded", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.total_book) {
-            Toast.makeText(getApplicationContext(), "Total Book: " + String.valueOf(bookList.size()), Toast.LENGTH_SHORT).show();
+            if (mBookViewModel != null) {
+                mBookViewModel.getBookCount().observe(this, count -> {
+                    Toast.makeText(getApplicationContext(), "Total Book: " + count, Toast.LENGTH_SHORT).show();
+                });
+            }
+        } else if (id == R.id.remove_expensive_books) {
+            if (mBookViewModel != null) {
+                mBookViewModel.deleteExpensiveBooks();
+                Toast.makeText(getApplicationContext(), "Expensive Books Removed", Toast.LENGTH_SHORT).show();
+            }
         }
         return super.onOptionsItemSelected(item);
     }

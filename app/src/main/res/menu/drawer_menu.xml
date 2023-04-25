@@ -11,6 +11,9 @@
         android:id="@+id/remove_all_books"
         android:title="Remove All Books" />
     <item
+        android:id="@+id/view_list"
+        android:title="View List" />
+    <item
         android:id="@+id/close"
         android:title="Close" />
 </menu>

@@ -1,20 +1,51 @@
-package com.example.android_app;
+package com.example.android_app.provider;
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "books")
 public class Book {
-    private String ID;
-    private String title;
-    private String isbn;
-    private String author;
-    private String description;
-    private String price;
 
-    public Book(String ID, String title, String isbn, String author, String description, String price) {
+    @PrimaryKey(autoGenerate = true)
+    @NonNull
+    @ColumnInfo(name = "bookID")
+    private int bookID;
+    
+    @ColumnInfo(name = "ID")
+    private String ID;
+    
+    @ColumnInfo(name="title")
+    private String title;
+
+    @ColumnInfo(name="isbn")
+    private String isbn;
+
+    @ColumnInfo(name="author")
+    private String author;
+
+    @ColumnInfo(name="description")
+    private String description;
+
+    @ColumnInfo(name="price")
+    private int price;
+
+    public Book(String ID, String title, String isbn, String author, String description,  int price) {
         this.ID = ID;
         this.title = title;
         this.isbn = isbn;
         this.author = author;
         this.description = description;
         this.price = price;
+    }
+
+    public int getBookID() {
+        return this.bookID;
+    };
+
+    public void setBookID(int bookID) {
+        this.bookID = bookID;
     }
 
     public String getID() {
@@ -37,7 +68,7 @@ public class Book {
         return this.description;
     }
 
-    public String getPrice() {
+    public int getPrice() {
         return this.price;
     }
 
@@ -61,7 +92,7 @@ public class Book {
         this.description = description;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(int price) {
         this.price = price;
     }
 }
