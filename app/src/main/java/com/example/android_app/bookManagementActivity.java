@@ -50,6 +50,9 @@ public class bookManagementActivity extends AppCompatActivity {
 
     // variables for keeping track of touch movement
     private int x_start, y_start;
+    private final static int vertical_threshold = 500;
+    private final static int horizontal_threshold = 50;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,21 +118,25 @@ public class bookManagementActivity extends AppCompatActivity {
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 int motion = motionEvent.getActionMasked();
                 int x_end, y_end;
-                int threshold = 100; // for diagonal detection
 
                 switch(motion) {
                     case (MotionEvent.ACTION_DOWN):
                         x_start = (int) motionEvent.getX();
                         y_start = (int) motionEvent.getY();
+
+                        if (x_start < 50 && y_start < 150) {
+                            if (editAuthor != null || editAuthor.getText().toString() != "") {
+                                editAuthor.setText(editAuthor.getText().toString().toUpperCase());
+                            }
+                        }
                         return true;
 
                     case (MotionEvent.ACTION_MOVE):
                         x_end = (int) motionEvent.getX();
                         y_end = (int) motionEvent.getY();
-                        // left to right increasing x, so subtraction of the x end from the xstart then left to right
-                        // check if there is a big increase in Y value (like diagonal movement) then do not detect it
-                        if(Math.abs(x_end - x_start) > Math.abs(y_end - y_start) &&
-                                Math.abs(x_end - x_start - y_end + y_start) > threshold) { // Horizontal move
+
+                        // subtraction of y_end and y_start to check if there is a large distance change in y-axis
+                        if(Math.abs(y_end - y_start) < horizontal_threshold) {
                             if(x_start > x_end) { // Right to Left swipe
                                 Toast.makeText(getApplicationContext(), "Item added", Toast.LENGTH_LONG).show();
                                 showToast();
@@ -144,12 +151,19 @@ public class bookManagementActivity extends AppCompatActivity {
                     case (MotionEvent.ACTION_UP):
                         x_end = (int) motionEvent.getX();
                         y_end = (int) motionEvent.getY();
-                        if(y_start > y_end && Math.abs(x_end - x_start) < Math.abs(y_end - y_start) &&
-                                Math.abs(x_end - x_start - y_end + y_start) > threshold) { // Bottom to Top swipe
+
+                        // top to bottom
+                        if (y_end > y_start && Math.abs(y_end - y_start) > vertical_threshold) {
+                            finishAffinity();
+                            Log.i("LOG", "finish call() executed");
+                        }
+                        // bottom to top
+                        if (y_end < y_start && Math.abs(y_start - y_end) > vertical_threshold) {
                             clearInputs();
                             Toast.makeText(getApplicationContext(), "Cleared Fields", Toast.LENGTH_SHORT).show();
                         }
                         return true;
+
                     default:
                         return false;
                 }
