@@ -18,6 +18,9 @@
         android:theme="@style/Theme.Androidapp"
         tools:targetApi="31">
         <activity
+            android:name=".workshop_week11"
+            android:exported="false" />
+        <activity
             android:name=".bookListActivity"
             android:exported="false" />
 
@@ -36,8 +39,8 @@
         <activity
             android:name=".bookManagementActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize"
-            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar" />
+            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".FinishActivity"
             android:exported="false"
