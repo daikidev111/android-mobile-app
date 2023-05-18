@@ -16,6 +16,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -44,6 +45,7 @@ public class bookManagementActivity extends AppCompatActivity {
     DrawerLayout bookDrawer;
 
     NavigationView bookNavigation;
+    GestureDetector gestureDetector;
 
     // declare view model for book object
     private BookViewModel mBookViewModel;
@@ -111,6 +113,9 @@ public class bookManagementActivity extends AppCompatActivity {
             }
         });
 
+        // instantiate a gesture detector class
+        gestureDetector = new GestureDetector(this, new gestureDetector());
+
         // make the layout accessible with motion event
         motionLayout.setOnTouchListener(new View.OnTouchListener() {
             @SuppressLint("ClickableViewAccessibility")
@@ -170,6 +175,47 @@ public class bookManagementActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    static class gestureDetector extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
+            Log.i("Debug", "OnSingleTapConfirmed");
+            // TODO: generate a new random ISBN
+            return super.onSingleTapConfirmed(e);
+        }
+        @Override
+        public boolean onDoubleTap(@NonNull MotionEvent e) {
+            Log.i("Debug", "onDoubleTap");
+            // TODO: add clearAllFields()
+            return super.onDoubleTap(e);
+        }
+        @Override
+        public boolean onScroll(@NonNull MotionEvent e1, @NonNull MotionEvent e2, float distanceX, float distanceY) {
+            // e1 is the touchDown Event -> when you touch down the screen
+            // e2 is the move motion event that triggered the CURRENT onScroll
+            // distance X is the distance along the X axis that has been scrolled
+            // distance Y is the distance along the Y axis that has been scrolled
+            // distance is NOT the distance between e1 and e2
+            // distance = current e2 - previous e2
+            Log.i("Week 11", "onScroll");
+            return super.onScroll(e1, e2, distanceX, distanceY);
+        }
+
+        @Override
+        public boolean onFling(@NonNull MotionEvent e1, @NonNull MotionEvent e2, float velocityX, float velocityY) {
+            // TODO: invoke moveTaskToBack(true);
+            if (velocityX > 1000 || velocityY > 1000) {
+                Log.i("Debug", "onFling");
+            }
+            return super.onFling(e1, e2, velocityX, velocityY);
+        }
+        @Override
+        public void onLongPress(@NonNull MotionEvent e) {
+            // TODO: load default/saved values
+            Log.i("Debug", "onLongPress");
+            super.onLongPress(e);
+        }
     }
 
     class bookNavigationListener implements NavigationView.OnNavigationItemSelectedListener {
