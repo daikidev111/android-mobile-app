@@ -16,14 +16,14 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.Androidapp"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".workshop_week11"
+            android:name=".RegisterActivity"
             android:exported="false" />
         <activity
             android:name=".bookListActivity"
             android:exported="false" />
-
         <receiver
             android:name=".SMSReceiver"
             android:enabled="true"
