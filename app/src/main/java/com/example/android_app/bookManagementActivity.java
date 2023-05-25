@@ -22,7 +22,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
@@ -30,13 +29,13 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.android_app.provider.Book;
 import com.example.android_app.provider.BookViewModel;
+import com.example.android_app.utility.randomString;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.StringTokenizer;
 
 public class bookManagementActivity extends AppCompatActivity {
-//    private final List<Book> bookCollection = new ArrayList<>();
     TextView editID, editTitle, editISBN, editAuthor, editDescription, editPrice;
     ConstraintLayout motionLayout;
     FloatingActionButton fabAdd;
@@ -56,6 +55,7 @@ public class bookManagementActivity extends AppCompatActivity {
     private final static int horizontal_threshold = 50;
 
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -118,101 +118,68 @@ public class bookManagementActivity extends AppCompatActivity {
 
         // make the layout accessible with motion event
         motionLayout.setOnTouchListener(new View.OnTouchListener() {
-            @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                int motion = motionEvent.getActionMasked();
-                int x_end, y_end;
-
-                switch(motion) {
-                    case (MotionEvent.ACTION_DOWN):
-                        x_start = (int) motionEvent.getX();
-                        y_start = (int) motionEvent.getY();
-
-                        if (x_start < 50 && y_start < 150) {
-                            if (editAuthor != null || editAuthor.getText().toString() != "") {
-                                editAuthor.setText(editAuthor.getText().toString().toUpperCase());
-                            }
-                        }
-                        return true;
-
-                    case (MotionEvent.ACTION_MOVE):
-                        x_end = (int) motionEvent.getX();
-                        y_end = (int) motionEvent.getY();
-
-                        // subtraction of y_end and y_start to check if there is a large distance change in y-axis
-                        if(Math.abs(y_end - y_start) < horizontal_threshold) {
-                            if(x_start > x_end) { // Right to Left swipe
-                                Toast.makeText(getApplicationContext(), "Item added", Toast.LENGTH_LONG).show();
-                                showToast();
-                                Book book = new Book(editID.getText().toString(), editTitle.getText().toString(), editISBN.getText().toString(),
-                                        editDescription.getText().toString(), editAuthor.getText().toString(), Integer.parseInt(editPrice.getText().toString()));
-                                mBookViewModel.insert(book);
-                            } else { // Left to Right swipe
-                                editPrice.setText(String.valueOf(Integer.parseInt(editPrice.getText().toString()) + 1));
-                            }
-                        }
-                        return true;
-                    case (MotionEvent.ACTION_UP):
-                        x_end = (int) motionEvent.getX();
-                        y_end = (int) motionEvent.getY();
-
-                        // top to bottom
-                        if (y_end > y_start && Math.abs(y_end - y_start) > vertical_threshold) {
-                            finishAffinity();
-                            Log.i("LOG", "finish call() executed");
-                        }
-                        // bottom to top
-                        if (y_end < y_start && Math.abs(y_start - y_end) > vertical_threshold) {
-                            clearInputs();
-                            Toast.makeText(getApplicationContext(), "Cleared Fields", Toast.LENGTH_SHORT).show();
-                        }
-                        return true;
-
-                    default:
-                        return false;
-                }
+                gestureDetector.onTouchEvent(motionEvent);
+                return true;
             }
         });
-
     }
 
-    static class gestureDetector extends GestureDetector.SimpleOnGestureListener {
+    class gestureDetector extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
             Log.i("Debug", "OnSingleTapConfirmed");
-            // TODO: generate a new random ISBN
+            String randomISBNString = randomString.generateNewRandomString(10);
+//            editISBN = findViewById(R.id.editISBN);
+            editISBN.setText(randomISBNString);
+
             return super.onSingleTapConfirmed(e);
         }
         @Override
         public boolean onDoubleTap(@NonNull MotionEvent e) {
             Log.i("Debug", "onDoubleTap");
-            // TODO: add clearAllFields()
+            clearInputs();
             return super.onDoubleTap(e);
         }
         @Override
         public boolean onScroll(@NonNull MotionEvent e1, @NonNull MotionEvent e2, float distanceX, float distanceY) {
-            // e1 is the touchDown Event -> when you touch down the screen
-            // e2 is the move motion event that triggered the CURRENT onScroll
-            // distance X is the distance along the X axis that has been scrolled
-            // distance Y is the distance along the Y axis that has been scrolled
-            // distance is NOT the distance between e1 and e2
-            // distance = current e2 - previous e2
-            Log.i("Week 11", "onScroll");
+            int price = 0;
+            if (editPrice.getText().length() != 0) {
+                price = Integer.parseInt(editPrice.getText().toString());
+            }
+
+            if (Math.abs(distanceX) >= 50 && Math.abs(distanceY) < 50) {
+                if (e2.getX() > e1.getX()) {
+                    price += Math.abs(distanceX);
+                    editPrice.setText(String.valueOf(price));
+                } else {
+                    price -= Math.abs(distanceX);
+                    if (price < 0) {
+                        price = 0;
+                    }
+                    editPrice.setText(String.valueOf(price));
+                }
+            } else if (Math.abs(distanceY) >= 50 && Math.abs(distanceX) < 50) {
+                Log.i("Debug", "vertical scroll");
+                if (e2.getY() > e1.getY()) {
+                    editTitle.setText("untitled");
+                }
+            }
             return super.onScroll(e1, e2, distanceX, distanceY);
         }
 
         @Override
         public boolean onFling(@NonNull MotionEvent e1, @NonNull MotionEvent e2, float velocityX, float velocityY) {
-            // TODO: invoke moveTaskToBack(true);
             if (velocityX > 1000 || velocityY > 1000) {
+                moveTaskToBack(true);
                 Log.i("Debug", "onFling");
             }
             return super.onFling(e1, e2, velocityX, velocityY);
         }
         @Override
         public void onLongPress(@NonNull MotionEvent e) {
-            // TODO: load default/saved values
+            loadBook();
             Log.i("Debug", "onLongPress");
             super.onLongPress(e);
         }
